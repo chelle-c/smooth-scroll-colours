@@ -1,5 +1,5 @@
 <script>
-	import '$lib/images/';
+	import 'images/';
 
 	let sections = [
 		{ id: 1, image: 'red', alt: '', colour: '#00c1b5' },
