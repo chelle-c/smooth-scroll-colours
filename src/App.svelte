@@ -2,19 +2,45 @@
 	import 'images/';
 
 	let sections = [
-		{ id: 1, image: 'red', alt: '', colour: '#00c1b5' },
-		{ id: 2, image: 'blue', alt: '', colour: '#ff651a' },
-		{ id: 3, image: 'yellow', alt: '', colour: '#ffbe00' },
-		{ id: 4, image: 'orange', alt: '', colour: '#1d3fbb' },
-		{ id: 5, image: 'turquoise', alt: '', colour: '#e30512' },
+		{
+			id: 1,
+			image: 'red',
+			alt: 'A white building against a clear, light teal sky.',
+			colour: '#00c1b5',
+		},
+		{
+			id: 2,
+			image: 'blue',
+			alt: 'A window with a balcony railing on a house with an orange exterior. The railing holds three orange planting pots containing different succulents.',
+			colour: '#ff651a',
+		},
+		{
+			id: 3,
+			image: 'yellow',
+			alt: 'An upward view to a skylight within a triangular building.',
+			colour: '#ffbe00',
+		},
+		{
+			id: 4,
+			image: 'orange',
+			alt: 'Exterior of a blue building.',
+			colour: '#1d3fbb',
+		},
+		{
+			id: 5,
+			image: 'turquoise',
+			alt: 'Exterior of a red tiled building with a window in the center covered with white blinds.',
+			colour: '#e30512',
+		},
 	];
 
 	let box;
 	let yTop = 0;
 	let yBottom = 0;
 	let yHeight = 0;
-	let innerHeight;
-	let lastScroll = 0;
+	let innerHeight = 0;
+	let lastTop = 0;
+	let lastBottom = 0;
 	let isScrolling = false;
 
 	const colours = sections.map(section => section.colour);
@@ -22,54 +48,79 @@
 
 	let changeBGColour = () => {
 		isScrolling = true;
-
-		if (yTop >= 0 && yTop > lastScroll) {
-			for (let index = 0; index < sections.length; index++) {
-				if (lastScroll <= innerHeight * index) {
+		if (yTop >= 0 && yTop > lastTop) {
+			// Scrolling down
+			for (let index = 1; index < colours.length; index++) {
+				if (yTop <= (innerHeight + 1) * index) {
 					bgColour = colours[index];
+					index >= 3
+						? document
+								.getElementById('content')
+								.classList.add('text-white')
+						: document
+								.getElementById('content')
+								.classList.remove('text-white');
 					break;
 				}
 			}
-		} else if (yTop < lastScroll) {
-			for (let index = 0; index < sections.length; index++) {
-				if (lastScroll < innerHeight * (index + 1)) {
+		} else if (yTop < lastTop) {
+			// Scrolling up
+			for (let index = 0; index < colours.length - 1; index++) {
+				if (lastTop < innerHeight * (index + 1)) {
 					bgColour = colours[index];
+					index >= 3
+						? document
+								.getElementById('content')
+								.classList.add('text-white')
+						: document
+								.getElementById('content')
+								.classList.remove('text-white');
 					break;
 				}
 			}
 		}
-		
-		lastScroll = yTop;
+		lastTop = yTop;
+		lastBottom = yBottom;
 		isScrolling = false;
 	};
 
 	let parseScroll = () => {
-		yTop = box.scrollTop;
-		yBottom = yTop + innerHeight;
-		yHeight = box.scrollHeight;
+		yTop = Math.floor(box.scrollTop);
+		yBottom = Math.floor(yTop + innerHeight);
+		yHeight = Math.floor(box.scrollHeight);
 		changeBGColour();
+		appHeight();
 	};
+
+	const appHeight = () => {
+		document.documentElement.style.setProperty(
+			'--app-height',
+			`${window.innerHeight}px`
+		);
+	};
+	window.addEventListener('resize', appHeight);
+	appHeight();
 </script>
 
 <svelte:window bind:innerHeight />
 
 <div
 	id="background"
-	class="bgDisplay min-w-full min-h-screen z-0 absolute"
+	class="bgDisplay min-w-full min-h-full z-0 absolute"
 	style="transition: background-color 1.5s; background-color: {bgColour}"
 />
 
 <main
-	class="scrollsnap-container min-w-full min-h-screen scroll-smooth"
+	id="content"
+	class="scrollsnap-container min-w-full min-h-full scroll-smooth"
 	bind:this={box}
 	on:scroll={!isScrolling ? parseScroll : null}
-	on:mousemove={!isScrolling ? parseScroll : null}
 >
 	<div
 		class="min-w-full p-6 flex flex-row justify-between items-center z-10 absolute"
 	>
 		<div>
-			<h1 class="font-sans font-bold text-5xl uppercase">
+			<h1 class="font-sans font-bold md:text-5xl text-3xl uppercase">
 				Scroll & Colours
 			</h1>
 		</div>
@@ -81,12 +132,12 @@
 	{#each [...sections].reverse() as { id, image, alt }}
 		<section
 			id="section{id}"
-			class="min-w-full min-h-screen"
+			class="[&:nth-child(5)]:text-white [&:nth-child(6)]:text-white"
 		>
-			<div class="drop-shadow-2xl">
+			<div class="drop-shadow-2xl mix-blend-hard-light">
 				<img
 					class="w-96 rounded-lg"
-					src="/images/image-{image}.jpg"
+					src="images/image-{image}.jpg"
 					{alt}
 				/>
 			</div>
@@ -104,7 +155,9 @@
 				>Project Idea</a
 			>
 		</div>
-		<div class="font-sans font-semibold text-xl text-center pointer-events-auto">
+		<div
+			class="font-sans font-semibold text-xl text-center pointer-events-auto"
+		>
 			<ul>
 				<li class="w-28">
 					<a href="#section5" class="hover:font-bold">Section #5</a>
@@ -130,44 +183,4 @@
 	@tailwind base;
 	@tailwind components;
 	@tailwind utilities;
-
-	:global(body) {
-		margin: 0;
-		padding: 0;
-	}
-
-	a,
-	a:visited {
-		color: inherit;
-	}
-
-	section {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		width: 100vw;
-		height: 100vh;
-		scroll-snap-align: start;
-		scroll-snap-stop: always;
-		position: relative;
-		background: inherit;
-		transition: background-color 1s linear;
-	}
-
-	.scrollsnap-container {
-		display: flex;
-		flex-direction: column;
-		width: 100vw;
-		height: 100%;
-		margin: 0;
-		padding: 0;
-		overflow-x: hidden;
-		overflow-y: scroll;
-		scroll-snap-type: y mandatory;
-		scroll-snap-type: mandatory; /* for older browsers */
-		scroll-snap-points-y: repeat(100vh); /* for older browsers */
-		scrollbar-width: none;
-		background: transparent;
-	}
 </style>
