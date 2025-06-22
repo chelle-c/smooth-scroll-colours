@@ -1,36 +1,36 @@
 <script>
-	import 'images/';
+	import { onMount } from "svelte";
 
 	let sections = [
 		{
 			id: 1,
-			image: 'red',
-			alt: 'Exterior of a red tiled building with a window in the center covered with white blinds.',
-			colour: '#00c1b5',
+			image: "red",
+			alt: "Exterior of a red tiled building with a window in the center covered with white blinds.",
+			colour: "#00c1b5",
 		},
 		{
 			id: 2,
-			image: 'blue',
-			alt: 'Exterior of a blue building.',
-			colour: '#ff651a',
+			image: "blue",
+			alt: "Exterior of a blue building.",
+			colour: "#ff651a",
 		},
 		{
 			id: 3,
-			image: 'yellow',
-			alt: 'An upward view to a skylight within a triangular building.',
-			colour: '#ffbe00',
+			image: "yellow",
+			alt: "An upward view to a skylight within a triangular building.",
+			colour: "#ffbe00",
 		},
 		{
 			id: 4,
-			image: 'orange',
-			alt: 'A window with a balcony railing on a house with an orange exterior. The railing holds three orange planting pots containing different succulents.',
-			colour: '#1d3fbb',
+			image: "orange",
+			alt: "A window with a balcony railing on a house with an orange exterior. The railing holds three orange planting pots containing different succulents.",
+			colour: "#1d3fbb",
 		},
 		{
 			id: 5,
-			image: 'turquoise',
-			alt: 'A white building against a clear, light teal sky.',
-			colour: '#e30512',
+			image: "turquoise",
+			alt: "A white building against a clear, light teal sky.",
+			colour: "#e30512",
 		},
 	];
 
@@ -43,8 +43,8 @@
 	let isScrolling = false;
 	let sectionIndex = 0;
 
-	const colours = sections.map(section => section.colour);
-	let bgColour = '#00c1b5';
+	const colours = sections.map((section) => section.colour);
+	let bgColour = "#00c1b5";
 
 	let changeBGColour = () => {
 		if (yTop >= 0 && yTop >= lastTop) {
@@ -59,7 +59,7 @@
 		} else if (yTop <= lastTop) {
 			// Scrolling up
 			for (let index = 0; index < colours.length - 1; index++) {
-				if (yTop < (innerHeight) * (index + 1)) {
+				if (yTop < innerHeight * (index + 1)) {
 					bgColour = colours[index];
 					sectionIndex = index;
 					break;
@@ -77,20 +77,27 @@
 	};
 
 	let whiteText = () => {
-		let content = document.getElementById('content');
-		sectionIndex >= 3
-			? content.classList.add('text-white')
-			: content.classList.remove('text-white');
+		let content = document.getElementById("content");
+		sectionIndex >= 3 ?
+			content.classList.add("text-white")
+		:	content.classList.remove("text-white");
 	};
 
 	const appHeight = () => {
 		document.documentElement.style.setProperty(
-			'--app-height',
+			"--app-height",
 			`${window.innerHeight}px`
 		);
 	};
-	window.addEventListener('resize', appHeight);
-	appHeight();
+
+	onMount(() => {
+		window.addEventListener("resize", appHeight);
+		appHeight();
+		// Cleanup on destroy
+		return () => {
+			window.removeEventListener("resize", appHeight);
+		};
+	});
 </script>
 
 <svelte:window bind:innerHeight />
@@ -98,7 +105,8 @@
 <div
 	id="background"
 	class="absolute z-0 min-w-full min-h-full bgDisplay"
-	style="transition: background-color 1s; background-color: {bgColour}"
+	style:background-color={bgColour}
+	style:transition="background-color 1s"
 />
 
 <main

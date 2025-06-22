@@ -1,17 +1,15 @@
 /** @type {import('tailwindcss').Config} */
-const production = process.env.NODE_ENV !== 'development'
-module.exports = {
-	future: {
-		purgeLayersByDefault: true,
-		removeDeprecatedGapUtilities: true,
-	},
-	purge: {
-		content: ['./src/**/*.svelte'],
-		enabled: production, // disable purge in dev
-	},
-	content: [],
+const production = process.env.NODE_ENV !== "development";
+export default {
+	content: ["./src/**/*.{html,js,svelte}", "./public/**/*.html"],
 	theme: {
 		extend: {},
 	},
 	plugins: [],
+	future: {
+		removeDeprecatedGapUtilities: true,
+	},
+	purge: {
+		enabled: production,
+	},
 };
